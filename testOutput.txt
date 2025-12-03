@@ -1,0 +1,24 @@
+```json
+{
+"Cluster ID": 1,
+"Behavior Description": "The traffic in this cluster is characterized by long-lasting flows with a significantly high rate of packets per second. These flows consistently target a specific, non-standard, or high-numbered destination port. This pattern suggests a sustained, high-volume, and focused communication stream directed at a single service.",
+"Threat Assessment": "The combination of high duration, high packet rate, and a specific destination port is a strong indicator of a Denial-of-Service (DDoS) attack. The behavior aims to overwhelm a specific service by flooding it with a high volume of traffic over a sustained period. This is not characteristic of normal network activity like web browsing or port scanning. The goal is likely to exhaust the resources of the target, making the service unavailable to legitimate users.",
+"Label": "DDoS"
+}
+
+```json
+{
+  "Cluster ID": 2,
+  "Behavior Description": "This cluster is characterized by network traffic that falls well within normal operational parameters. All dominant feature scores are between -1 and 1. The data transfer rate ('Flow_Bytes/s'), the number of packets sent ('Total_Fwd_Packets'), and the protocol and port used are all slightly above the mean but not statistically significant. The timing of the traffic ('Timestamp') is also unremarkable. This represents typical, everyday network activity.",
+  "Threat Assessment": "There are no indicators of malicious activity within this cluster. Threat signatures such as abnormally high data rates (DDoS, Data Exfiltration), a high number of packets to many ports (Scanning), or unusual port/protocol combinations (Malware C2) are absent. All defining features align with the established baseline for benign traffic. The low number of samples (40) further suggests this is likely an infrequent but legitimate user or system activity.",
+  "Label": "Non-threat"
+}
+```
+```json
+{
+"Cluster ID": 3,
+"Behavior Description": "The traffic in this cluster is characterized by a significantly high average packet size (1.45), which is its most dominant feature. This is coupled with a significantly high number of forward packets (1.24). The number of backward packets (0.86) is slightly elevated but not anomalous, indicating a highly asymmetrical data flow. The activity also tends to occur later in the observed time window (Timestamp score of 1.26). In summary, these are connections that send a large amount of data in one direction using large packets.",  
+"Threat Assessment": "This pattern is a classic indicator of a large data upload. The combination of large packets and a high volume of forward packets, without a corresponding high volume of backward packets, is highly suspicious. While this could be a legitimate large file transfer (e.g., a backup to the cloud), it is a primary signature for Data Exfiltration, where sensitive information is being smuggled out of the network. The high deviation from the norm makes this behavior a high-priority threat candidate.",
+"Label": "Data Exfiltration"
+}
+```
