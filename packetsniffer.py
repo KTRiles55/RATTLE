@@ -6,6 +6,14 @@ from datetime import datetime
 from normalizer import Normalizer
 import ipaddress
 
+def sniff_traffic():
+    # Analyze network to capture packet data
+    capture = sniff(iface='eth0', count=20)
+    packets = [p for p in capture if p is not None]
+
+    # Write traffic data into a new pcap file
+    wrpcap('new_capture.pcap', packets)
+
 def retrieve_pcap_content(file_path): 
     # Read network traffic from pcap file saved from Wireshark
     capture = rdpcap(file_path)
@@ -97,4 +105,5 @@ def retrieve_payloads(conversations):
     
 
     
-        
+if __name__ == '__main__':
+    sniff_traffic()
