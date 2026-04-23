@@ -47,12 +47,18 @@ if __name__ == '__main__':
     #    tested AI-driven cluster analysis **
     trainer.generate_clusters(model, latent_space, 10)
     
-    # Retrieve network traffic data for prediction
-    capture = retrieve_pcap_content(" --INSERT PCAP FILE HERE-- ")
-    traffic = recordTraffic(capture)
+    # Retrieve network traffic data from live scan for prediction
+    sniff_traffic()
+
+    # Convert traffic capture into a pcap file for analysis
+    content = retrieve_pcap_content(r'new_capture.pcap')
+    traffic = recordTraffic(content)
     sessions = retrieve_payloads(traffic)
 
+    # Find predictions from retrieved payload data
     predictions = trainer.get_predictions(model, sessions, latent_space, pipeline)
+
+    print(predictions)
     
     """
     Work in progress...
