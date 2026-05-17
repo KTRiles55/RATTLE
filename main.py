@@ -1,3 +1,4 @@
+
 """
 Author: Kenneth Riles
 Date: 2025-07-21
@@ -19,7 +20,11 @@ def load_home():
 def load_analysis():
     return render_template("analysis.html")
 
-if __name__ == '__main__': 
+@app.route("/records")
+def load_records():
+    return render_template("records.html")
+
+if __name__ == '__main__':
     # Setup training model for the dataset
     trainer = ModelTrainer()
 
@@ -46,7 +51,9 @@ if __name__ == '__main__':
     #    view the elbow method and silhouette score graphs, along with
     #    tested AI-driven cluster analysis **
     trainer.generate_clusters(model, latent_space, 10)
-    
+
+    """
+
     # Retrieve network traffic data from live scan for prediction
     sniff_traffic()
 
@@ -59,12 +66,9 @@ if __name__ == '__main__':
     predictions = trainer.get_predictions(model, sessions, latent_space, pipeline)
 
     print(predictions)
-    
-    """
-    Work in progress...
 
     """
 
 
     # Run Flask server
-    app.run()
+    app.run(host='0.0.0.0', port=5000, debug=True)
