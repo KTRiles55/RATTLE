@@ -15,6 +15,8 @@ This project aims to develop a new and sophisticated system that utilizes the ca
 ## User Interface
 <img width="1838" height="904" alt="Screenshot (476)" src="https://github.com/user-attachments/assets/07285460-7bf6-44d0-baba-bbd104bfb8cc" />
 
+<img width="1868" height="905" alt="Screenshot (509)" src="https://github.com/user-attachments/assets/db9d344e-be74-404d-bac8-959ffdd14584" />
+
 
 ## Training Results
 <img width="1588" height="856" alt="Screenshot (473)" src="https://github.com/user-attachments/assets/b75b0bec-c6f2-4b76-9e90-8ed988bd78ec" />
