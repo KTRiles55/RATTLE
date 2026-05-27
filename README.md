@@ -6,11 +6,11 @@ RATTLE (Real-Time Anomaly Tracking and Threat Level Escalation) is an AI-powered
 This project aims to develop a new and sophisticated system that utilizes the capabilities of AI to instantly detect real-time network threats with high accuracy using external network telemetry and continuous monitoring. It is made to adapt to zero day and other unknown cyber threats, and integrate with enterprise SIEM systems. It will also include additional features, such as malware detection, data and trend visualization, and alert generation.
 
 ## Technology Stack
-* <b>UI Components & Design:</b> HTML, Bootstrap, Flask
-* <b>Machine Learning & Data Analytics:</b> Python, TensorFlow, Keras, Scikit-learn, Numpy, Pandas, Matplotlib
-* <b>Artificial Intelligence:</b> Google Cloud Platform, Vertex AI, LangChain, Gemini 2.5 Pro
-* <b>Containerization & Deployment:</b> Docker, GitHub, Git
-* <b>Traffic Monitoring & Packet Inspection:</b> ScaPy, Wireshark, Kali Linux, VirtualBox
+* <b>UI Components & Design:</b> HTML, CSS, Bootstrap
+* <b>Machine Learning & Data Analytics:</b> Python, MySQL, TensorFlow, Keras, Scikit-learn, Numpy, Pandas, Matplotlib
+* <b>Artificial Intelligence:</b> Google Cloud Platform, Vertex AI, LangChain, Gemini 2.5 Flash
+* <b>Containerization & Deployment:</b> Docker, Flask, GitHub, Git
+* <b>Traffic Monitoring & Packet Inspection:</b> ScaPy, Wireshark, Ubuntu Linux, VirtualBox, WSL2
 
 ## User Interface
 <img width="1838" height="904" alt="Screenshot (476)" src="https://github.com/user-attachments/assets/07285460-7bf6-44d0-baba-bbd104bfb8cc" />
