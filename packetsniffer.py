@@ -6,9 +6,9 @@ from datetime import datetime
 from normalizer import Normalizer
 import ipaddress
 
-def sniff_traffic():
+def sniff_traffic(num_packets):
     # Analyze network to capture packet data
-    capture = sniff(iface='eth0', count=20)
+    capture = sniff(iface='eth0', count=num_packets)
     packets = [p for p in capture if p is not None]
 
     # Write traffic data into a new pcap file
@@ -101,9 +101,4 @@ def retrieve_payloads(conversations):
                                flow_packets, flow_bytes, average_pkt_size, max_pkt_size,
                                total_packets, total_payload))
 
-    return sessions
-    
-
-    
-if __name__ == '__main__':
-    sniff_traffic()
+    return sessions    

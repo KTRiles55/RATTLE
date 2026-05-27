@@ -4,14 +4,27 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 </head>
 <title>RATTLE records</title>
-<div class="d-flex-start flex-column justify-content-center align-items-center vh-100 vw-100 bg-dark font-monospace">
+<div class="d-flex-start flex-column text-white justify-content-center align-items-center vh-100 vw-100 bg-dark font-monospace">
     <img class="rounded-circle" style="width: 10rem; height:10rem; mix-blend-mode:screen" src="{{ url_for('static', filename='images/rattlelogo.jpeg') }}" alt="RATTLE Logo"/>
-<div>
-    <h2>Network Traffic Logs</h2>
-    <h2>Alert Logs</h2>
-    <h2>Packet Statistics</h2>
-    <h2>Events Over Time</h2>
-    <h2>Threat Types</h2>
+  <div class="d-flex flex-row m-2 gap-5 border border-3 border-success p-4
+          justify-content-center align-items-center">
+    <section class="d-flex flex-column">
+      <h2>Network Traffic Logs</h2>
+        <article class="bg-light container overflow-auto">
+          <ul id="tlogs"/>
+            <p id="traffic"/>
+        </article>
+      <h2>Event Logs</h2>
+        <article class="bg-light container overflow-auto">
+          <ul id="elogs"/>
+            <p id="event"/>
+        </article>
+    </section>
+    <section class="d-flex flex-column">
+      <h2>Events Over Time</h2>
+        <article class="bg-light container">No content</article>
+      <h2>Threat Types</h2>
+        <article class="bg-light container">No content</article>
+    </section>
   </div>
-</div>
 </div>

@@ -44,6 +44,9 @@ class ClusterValidator:
 
         ax.yaxis.set_major_locator(MultipleLocator(5))
         ax.yaxis.set_minor_locator(MultipleLocator(0.5))
+        plt.title("Elbow Curve")
+        plt.xlabel("Value of k")
+        plt.ylabel("Epsilon value")
         plt.show()
 
     @staticmethod
@@ -51,9 +54,11 @@ class ClusterValidator:
         # Calculate and plot silhouette scores for each sample in the lower dimensional field
         scores = silhouette_samples(latent_space, labels)
         plt.plot(scores, marker='*')
+        plt.title("Silhouette Scores")
         plt.show()
     
         plt.scatter(f_space[:, 0], f_space[:, 1], c=f_labels, cmap='viridis')
+        plt.title("DBSCAN Clusters")
         plt.show()
 
     @staticmethod
@@ -62,8 +67,6 @@ class ClusterValidator:
         unique_labels = set(f_labels)
         cluster_arr = np.array([])
 
-        vertexai.init(project="seismic-lexicon-474904-g9", location="us-central1")
-        model = GenerativeModel("gemini-2.5-pro")
         system_prompt = (
             "You are a cybersecurity expert analyzing clusters of network traffic. "
             "Each cluster contains similar behavior. For each cluster, you must:\n\n"
@@ -93,7 +96,8 @@ class ClusterValidator:
             "\"2. ...\"\n"
             "// Only include this field if there are valid alternatives\n}"
         ) 
-    
+        
+        response_body = ""
         for i, l in enumerate(unique_labels):
             # Retrieve samples from the cluster with the assigned label
             c_samples = latent_space[(labels == l)]
@@ -127,4 +131,7 @@ class ClusterValidator:
                 f"Feature Summaries:\n{cluster_arr[i]['Feature Summary']}\n"
             )
             response = model.generate_content(system_prompt + "\n\n" + user_prompt)
-            print(response.text)
+            response_body += response.text
+        
+        with open("testOutput.txt", "w") as file:
+                file.write(response_body)

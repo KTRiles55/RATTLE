@@ -125,6 +125,7 @@ class ModelTrainer:
         # Find optimal k in elbow method, which will be used to find the optimal epsilon value
         ClusterValidator.plotNeighbors(min_samples, latent_array)
     
+       
         """
     
         # Group dense data in lower dimensional format into clusters
@@ -139,6 +140,7 @@ class ModelTrainer:
         self.unfiltered_labels = labels
         filtered_space = latent_space[filter_noise]
 
+
         """
 
         # FOR TESTING AND TRAINING PURPOSES: 
@@ -146,11 +148,13 @@ class ModelTrainer:
         # Calculate and plot silhouette scores to ensure good clustering
         ClusterValidator.plot_silhouette_scores(latent_space, labels, filtered_labels, filtered_space)
 
+      
         """
 
         # Return original model dimensionality
         decoded = model.decoder(latent_space)
 
+    
         """
 
         # FOR TESTING AND TRAINING PURPOSES:
@@ -158,6 +162,7 @@ class ModelTrainer:
         # Retrieve feature details of each cluster using Gemini 2.5 LLM
         ClusterValidator.analyze_clusters(latent_space, labels, filtered_labels, self.features)
 
+        
         """
 
     def get_predictions(self, model, sessions, latent_space, pipeline):

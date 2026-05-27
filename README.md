@@ -1,6 +1,6 @@
 # R.A.T.T.L.E.
 ## Overview
-An AI-powered intrusion detection system that uses unsupervised learning, including density-based spatial clustering, and deep learning algorithms to effectively detect anomalies in large sets of network telemetry data. The model is built as an autoencoder that compresses the data into 16-bit chunks for faster and more powerful processing.
+RATTLE (Real-Time Anomaly Tracking and Threat Level Escalation) is an AI-powered intrusion detection system that uses unsupervised learning, including density-based spatial clustering, and deep learning algorithms to effectively detect anomalies in large sets of network telemetry data. The model is built as an autoencoder that compresses the data into 16-bit chunks for faster and more powerful processing.
 
 ## Objective and Scope
 This project aims to develop a new and sophisticated system that utilizes the capabilities of AI to instantly detect real-time network threats with high accuracy using external network telemetry and continuous monitoring. It is made to adapt to zero day and other unknown cyber threats, and integrate with enterprise SIEM systems. It will also include additional features, such as malware detection, data and trend visualization, and alert generation.

@@ -16,15 +16,42 @@
   <div class="d-flex gap-4 justify-content-center align-items-center text-white
           border border-success border-4 p-3">
     <section class="d-flex flex-column p-2">
-      <input type="file" accept=".pcap"/>
-      <small>Max file size: 100 MB</small>
-      <small>Accepted file type: pcap</small>
-      <button class="d-flex-inline p-2 m-2 bg-primary text-white fw-bold
+       <form class="d-flex flex-column" action="/scan-cap"
+               method="POST" enctype="multipart/form-data">
+         <input id="capture" name="capture" type="file" accept=".pcap"/>
+         <small>Max file size: 100 MB</small>
+         <small>Accepted file type: pcap</small>
+         <button id="pc" class="btn d-flex-inline p-2 m-2 bg-primary text-white fw-bold
               border border-dark border-opacity-75 rounded-3" disabled>Scan Packet Capture</button>
+       </form>
+       <script>
+          file = document.getElementById('capture');
+          file.addEventListener('change', (e) => {
+             button = document.getElementById('pc');
+             button.disabled = false;
+          });
+       </script>
     </section>
       <small>Or</small>
-    <button class="d-flex-inline p-2 bg-success border border-dark
-            border-opacity-75 rounded-3 text-white fw-bold">Start Live Scan</button>
+      <form class="d-flex flex-column gap-3" action="/scan-live" method="POST" enctype="multipart/form-data">
+            <input id="count" name="count" type="number" placeholder="Enter 1-99"
+                    min="1" max="99"/>
+        <button id="lscan" class="btn d-flex-inline p-2 bg-success border border-dark
+                border-opacity-75 rounded-3 text-white fw-bold" disabled>Start Live Scan</button>
+      </form>
+      <script>
+        number = document.getElementById('count');
+        number.addEventListener('input', (e) => {
+           button = document.getElementById('lscan');
+           if ((number.value >= 1) && (number.value <= 99)) {
+              button.disabled = false;
+           }
+
+           else {
+              button.disabled = true;
+           }
+         });
+     </script>
   </div>
 </div>
   <form action="/">

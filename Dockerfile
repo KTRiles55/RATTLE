@@ -1,5 +1,5 @@
 # Configurations for project container
-FROM ubuntu:24.04
+FROM ubuntu:latest
 
 # Set working directory inside container
 WORKDIR /app
@@ -18,12 +18,6 @@ COPY requirements.txt .
 
 # Install Python dependencies
 RUN pip3 install --no-cache-dir -r requirements.txt
-
-# Copy Google API key into image
-# -- COPY API KEY HERE --
-
-# Set relative path for key
-# -- COPY API KEY PATH here --
 
 # Copy entire project into container
 COPY . .
