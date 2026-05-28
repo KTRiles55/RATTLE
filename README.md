@@ -15,7 +15,17 @@ This project aims to develop a new and sophisticated system that utilizes the ca
 ## User Interface
 <img width="1838" height="904" alt="Screenshot (476)" src="https://github.com/user-attachments/assets/07285460-7bf6-44d0-baba-bbd104bfb8cc" />
 
-<img width="1868" height="905" alt="Screenshot (509)" src="https://github.com/user-attachments/assets/db9d344e-be74-404d-bac8-959ffdd14584" />
+<img width="1868" height="917" alt="Screenshot (511)" src="https://github.com/user-attachments/assets/9c5c4683-e464-47eb-9713-661089c48e91" />
+
+
+## Scanning Results 
+<img width="1864" height="900" alt="Screenshot (512)" src="https://github.com/user-attachments/assets/94d561b5-8d8b-4303-b3b4-082de1a1fe73" />
+
+<img width="1838" height="902" alt="Screenshot (514)" src="https://github.com/user-attachments/assets/d44fea99-7251-4bf6-bed2-5f5bc826d89d" />
+
+<img width="1853" height="914" alt="Screenshot (515)" src="https://github.com/user-attachments/assets/2606cbfe-b7bb-496a-b427-26e841ccfaaf" />
+
+<img width="1845" height="909" alt="Screenshot (516)" src="https://github.com/user-attachments/assets/f1e69180-b3aa-4edb-8bcc-4d2a158b0b9f" />
 
 
 ## Training Results
