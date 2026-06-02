@@ -27,6 +27,9 @@ This project aims to develop a new and sophisticated system that utilizes the ca
 
 <img width="1845" height="909" alt="Screenshot (516)" src="https://github.com/user-attachments/assets/f1e69180-b3aa-4edb-8bcc-4d2a158b0b9f" />
 
+<img width="1637" height="883" alt="Screenshot (519)" src="https://github.com/user-attachments/assets/1a8ef296-8515-4204-a63d-1beae44795d1" />
+
+
 
 ## Training Results
 <img width="1588" height="856" alt="Screenshot (473)" src="https://github.com/user-attachments/assets/b75b0bec-c6f2-4b76-9e90-8ed988bd78ec" />
