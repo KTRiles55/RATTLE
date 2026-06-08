@@ -19,7 +19,7 @@ This project aims to develop a new and sophisticated system that utilizes the ca
 
 
 ## Scanning Results 
-<img width="1864" height="900" alt="Screenshot (512)" src="https://github.com/user-attachments/assets/94d561b5-8d8b-4303-b3b4-082de1a1fe73" />
+<img width="1857" height="901" alt="Screenshot (520)" src="https://github.com/user-attachments/assets/6c5d045b-9d54-42c8-b41f-b2f82faac697" />
 
 <img width="1838" height="902" alt="Screenshot (514)" src="https://github.com/user-attachments/assets/d44fea99-7251-4bf6-bed2-5f5bc826d89d" />
 
@@ -27,7 +27,7 @@ This project aims to develop a new and sophisticated system that utilizes the ca
 
 <img width="1845" height="909" alt="Screenshot (516)" src="https://github.com/user-attachments/assets/f1e69180-b3aa-4edb-8bcc-4d2a158b0b9f" />
 
-<img width="1637" height="883" alt="Screenshot (519)" src="https://github.com/user-attachments/assets/1a8ef296-8515-4204-a63d-1beae44795d1" />
+<img width="1838" height="881" alt="Screenshot (521)" src="https://github.com/user-attachments/assets/40c6be49-0472-416e-bc94-87a0a38e8a23" />
 
 
 
