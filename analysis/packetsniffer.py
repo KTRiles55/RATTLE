@@ -1,9 +1,9 @@
 from scapy.all import *
 from collections import defaultdict
-from session import Session
+from analysis.session import Session
 import numpy as np
 from datetime import datetime
-from normalizer import Normalizer
+from training.normalizer import Normalizer
 import ipaddress
 
 def sniff_traffic(num_packets):
@@ -12,7 +12,7 @@ def sniff_traffic(num_packets):
     packets = [p for p in capture if p is not None]
 
     # Write traffic data into a new pcap file
-    wrpcap('new_capture.pcap', packets)
+    wrpcap('uploads/new_capture.pcap', packets)
 
 def retrieve_pcap_content(file_path): 
     # Read network traffic from pcap file saved from Wireshark
@@ -101,4 +101,4 @@ def retrieve_payloads(conversations):
                                flow_packets, flow_bytes, average_pkt_size, max_pkt_size,
                                total_packets, total_payload))
 
-    return sessions    
+    return sessions

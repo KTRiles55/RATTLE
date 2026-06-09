@@ -4,10 +4,10 @@ import pandas as pd
 import math
 import random
 
-os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
-os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-os.environ['TF_CUDNN_DETERMINISTIC'] = '1'
+#os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
+#os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+#os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+#os.environ['TF_CUDNN_DETERMINISTIC'] = '1'
 
 import tensorflow as tf
 from tensorflow import data
@@ -16,9 +16,9 @@ from keras.losses import MeanSquaredError
 from sklearn.cluster import DBSCAN
 from sklearn.metrics import euclidean_distances
 from sklearn.preprocessing import MaxAbsScaler
-from autoencoder import AutoEncoder
-from normalizer import Normalizer
-from validator import ClusterValidator
+from training.autoencoder import AutoEncoder
+from training.normalizer import Normalizer
+from training.validator import ClusterValidator
 
 SEED = 57
 os.environ['PYTHONHASHSEED']=str(SEED)

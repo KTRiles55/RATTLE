@@ -1,0 +1,155 @@
+<!doctype html>
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+</head>
+<title>RATTLE results</title>
+<div class="d-flex-start flex-column justify-content-center align-items-center vh-100 vw-100 bg-dark font-monospace">
+    <img class="rounded-circle" style="width: 10rem; height:10rem; mix-blend-mode:screen" src="{{ url_for('static', filename='images/rattlelogo.jpeg') }}" alt="RATTLE Logo"/>
+    <div class="d-flex flex-column justify-content-center align-items-center">
+	<div class="d-flex flex-column border border-light
+		border-4 fs-5 text-white p-4">
+	   <h1 class="align-self-center fw-bold mb-4">Results</h1>
+	   <p id="num-p">Packets scanned: </p>
+	   <p id="num-t">Threats detected: </p>
+	   <p id="ftype">Scanning type: </p>
+	   <p id="time">Time elapsed: </p>
+	     <p id="notice" class="fs-3 fw-bold mt-4 align-self-center">No threats found</p> 
+	        <button id="view" type="button" class="btn w-25 align-self-center text-white bg-success border border-light
+			border-1 border-opacity-75 fw-bold border-rounded 
+		        rounded-3 p-2 fs-4 d-none" data-bs-toggle="modal" data-bs-target="#summary">
+	        Open
+	        </button>
+	     <div class="modal modal-lg" id="summary" aria-hidden="true" tabindex="-1">
+	       <div class="modal-dialog model-dialog-scrollable">
+	           <div class="modal-content bg-dark">
+	             <div class="modal-header">
+			 <h2 class="modal-title fw-bold">Threat Summary</h2>
+		     </div>
+	                <div class="modal-body">
+		          <div class="container-fluid">
+			    <ul id="threats">
+		              <article class="border border-2 border-danger p-4 m-2 fs-6"
+				       id="entry">
+			              <p class="fs-4" id="entry-id">&lt; Detected </p>
+				      <p id="entry-desc">* Description: </p>
+				      <p id="entry-assess">* Assessment: </p>
+				      <p id="entry-sol">* Solution:  
+				  <br/>
+				  <small>Steps</small>
+				  <ol class="d-flex flex-column gap-4" id="entry-sol-steps">
+                                  </ol>
+				</p>
+				<p>* Alternatives: </p>
+				<ul class="list-unstyled d-flex flex-column gap-4" id="entry-options">
+				</ul>
+			      </article>
+			    </ul>
+			  </div>
+			 </div>
+	                  <div class="modal-footer">
+			    <button class="btn text-white bg-danger border border-light border-1 border-opacity-75
+                                fw-bold border-rounded rounded-3 p-2 fs-4"
+				    type="button" data-bs-dismiss="modal">Close</button>
+		          </div>
+			</div>
+	           </div>
+	       </div>
+	   <section class="d-flex flex-row mt-5 justify-content-between align-items-center gap-5">
+	     <form action="/">
+             	<button class="btn text-white bg-danger border border-light border-1 border-opacity-75
+                        	fw-bold border-rounded rounded-3 p-2 fs-4">Go back</button>
+	     </form>
+	     <form action="/analysis">
+	     	<button class="btn text-white bg-warning border border-light border-1 border-opacity-75
+                        	fw-bold border-rounded rounded-3 p-2 fs-4">Scan again</button>
+	     </form>
+	     <form action="/records">
+		<button class="btn text-white bg-success border border-light border-1 border-opacity-75
+                        	fw-bold border-rounded rounded-3 p-2 fs-4">View statistics</button>
+             </form>
+	   </section>
+	</div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+   // Fill in parameters on page
+   document.getElementById("num-p").innerHTML += '{{ total }}';
+   document.getElementById("ftype").innerHTML += '{{ method }}';
+   document.getElementById("time").innerHTML += '{{ time }}s';
+
+   // Retrieve results from server side
+   var result = JSON.parse('{{ output | tojson }}');
+   
+   // Set variables for json object indices
+   const description = "Behavior Description";
+   const assessment = "Threat Assessment";
+   const label = "Label";
+   const solution = "Recommended Solution";
+   const options = "Alternative Solution(s)";
+
+   // Check if json object is a list
+   // If it is not, change it into a list
+   if (Array.isArray(result) === false) {
+      result = new Array(result);
+   }
+
+   var threat_list = document.getElementById("threats");
+   var obj = document.getElementById("entry");
+   var new_obj;
+   var children;
+   var steps;
+   var alternatives;
+   var num_threats = 0;
+
+   for (let i = 0; i < result.length; ++i) {
+      if (result[i][label] != "Non-threat") {
+	// Create new article
+	new_obj = obj.cloneNode(true);
+	new_obj.id = `${obj.id}${i+1}`;
+
+	// Update attributes
+	children = new_obj.children;
+	children[0].textContent += `${result[i][label]} >`;
+	children[1].textContent += result[i][description];
+	children[2].textContent += result[i][assessment];
+
+	// Add new element to list
+	steps = result[i][solution]["Steps"];
+	var next_step;
+	for (let j = 0; j < steps.length; ++j) {
+	    next_step = document.createElement("li");
+	    next_step.textContent = steps[j];
+	    children[4].appendChild(next_step);
+	}
+
+	alternatives = result[i][options];
+	var next_option;
+	for (let k = 0; k < alternatives.length; ++k) {
+	    next_option = document.createElement("li");
+	    next_option.textContent = alternatives[k];
+	    children[7].appendChild(next_option);
+	}
+	
+	// Add new article on document
+	threat_list.appendChild(new_obj);
+	num_threats = num_threats + 1;
+      }  
+   }
+   
+   document.getElementById("num-t").innerHTML += num_threats;
+
+   // Remove placeholder article
+   threat_list.removeChild(threat_list.firstElementChild);
+   
+   // Show threat summary if a threat exists
+   var message = document.getElementById("notice");
+   var summary = document.getElementById("view");
+   
+   if (num_threats > 0) {
+      message.innerHTML = "View Threat Summary: ";
+      summary.classList.remove("d-none");
+   }	
+</script>

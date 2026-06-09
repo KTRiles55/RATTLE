@@ -5,9 +5,8 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
 from sklearn.neighbors import NearestNeighbors
 from sklearn.metrics import silhouette_samples
-from vertexai.preview.generative_models import GenerativeModel
-import vertexai
-from normalizer import Normalizer
+from google import genai
+from training.normalizer import Normalizer
 
 load_dotenv()
 credentials = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
@@ -62,13 +61,14 @@ class ClusterValidator:
         plt.show()
 
     @staticmethod
-    def analyze_clusters(latent_space, labels, f_labels, feature_names):
+    def analyze_clusters(client, latent_space, labels, f_labels, feature_names):
         # Analyze cluster characteristics using Gemini LLM to assign possible labels
         unique_labels = set(f_labels)
         cluster_arr = np.array([])
-
         system_prompt = (
             "You are a cybersecurity expert analyzing clusters of network traffic. "
+            "The data below contains clusters of network traffic data that I want"
+            "you to analyze based on characteristics and behavior."
             "Each cluster contains similar behavior. For each cluster, you must:\n\n"
             "1. Describe the behavior based on statistical summaries of features.\n"
             "2. Identify if the behavior represents a threat (e.g., DDoS, Scanning, Malware, Data Exfiltration, or any other type of cyber threat). "
@@ -78,8 +78,8 @@ class ClusterValidator:
             "Values above 1 are significantly higher than average; values below -1 are significantly lower. "
             "Use this context to interpret whether a feature's behavior is abnormal.\n\n"
             "4. Suggest a step-by-step solution that a cybersecurity analyst should follow to respond to this threat and resolve it. "
-            "Explain each step clearly so that it can be understood regardless of the reader’s technical background. "
-            "Also explain *why* this approach is effective, and provide an estimated probability of success rate (as a percentile range). "
+            "Explain each step clearly so that it can be understood regardless of the reader\'s technical background. "
+            "Also explain why this approach is effective, and provide an estimated probability of success rate (as a percentile range). "
             "Feel free to suggest alternative solutions that might offer a higher probability of success rate or additional protection. "
             "Respond in the following format:\n"
             "{\n\"Cluster ID\": <int>\n"
@@ -130,8 +130,10 @@ class ClusterValidator:
                 f"Number of Samples: {cluster_arr[i]['Number of Samples']}\n"
                 f"Feature Summaries:\n{cluster_arr[i]['Feature Summary']}\n"
             )
-            response = model.generate_content(system_prompt + "\n\n" + user_prompt)
+            response = client.models.generate_content(model='gemini-2.5-flash', contents=f"{system_prompt}\n\n{user_prompt}")
             response_body += response.text
         
         with open("testOutput.txt", "w") as file:
                 file.write(response_body)
+
+        return client

@@ -1,66 +1,11 @@
 import json
-import mysql.connector
 import datetime
 import ipaddress
-from dotenv import load_dotenv
-import os
-
-load_dotenv()
-hostname = os.environ.get("HOST_NAME")
-username = os.environ.get("USERNAME")
-user_password = os.environ.get("PASSWORD")
+import mysql.connector
 
 
-def store_results(result, sessions):
+def store_results(client, cursor, parsed_output, sessions):
     try:
-        # Connect to relational database to store new data
-        conn = mysql.connector.connect(
-                host=hostname,
-                user=username,
-                password=user_password
-                )
-        cursor = conn.cursor()
-
-        # Check if database already exists. If not, create it.
-        cursor.execute("CREATE DATABASE IF NOT EXISTS rattleDB")
-        cursor.execute("USE rattleDB")
-
-        # Create new table for storing data classifications made by Gemini
-        cursor.execute(
-                """
-                CREATE TABLE IF NOT EXISTS Classes
-                (id INT, name VARCHAR(50) DEFAULT 'Non-threat', label INT DEFAULT 0,
-                assessment TEXT, solutions TEXT, options TEXT, time TIMESTAMP NOT NULL,
-                CONSTRAINT pk_class PRIMARY KEY (id, name)
-                )
-                """
-                )
-
-        # Create new table for storing network traffic data
-        cursor.execute(
-                """
-                CREATE TABLE IF NOT EXISTS Traffic
-                (time TIMESTAMP NOT NULL, src_ip VARCHAR(50) NOT NULL, dst_ip VARCHAR(50) NOT NULL,
-                protocol VARCHAR(8) NOT NULL, src_port INT NOT NULL, dst_port INT NOT NULL,
-                bytes_sent INT DEFAULT 0, bytes_recvd INT DEFAULT 0, flow_packets INT DEFAULT 0,
-                flow_bytes INT DEFAULT 0, avg_packet_size INT DEFAULT 0, max_packet_size INT DEFAULT 0,
-                num_packets INT DEFAULT 0, payload_size INT DEFAULT 0, id INT, name VARCHAR(50),
-                CONSTRAINT fk_class FOREIGN KEY (id, name) REFERENCES Classes(id, name)
-                )
-                """
-                )
-
-        # Write results to text file
-        output = result.text
-        with open("result.txt", "w") as file:
-            file.write(output)
-            find_json = output.index("json")
-            filtered_output = output[find_json:]
-            filtered_output = filtered_output.replace("`", "")
-            filtered_output = filtered_output.replace("json", "").strip("\n")
-
-        parsed_output = json.loads(filtered_output)
-
         # Insert new data into tables and update if name and id already exists
         class_query = """
                     INSERT INTO Classes (id, name, label, assessment, solutions, options, time)
@@ -74,11 +19,12 @@ def store_results(result, sessions):
                     """
         
         traffic_query = """
-                INSERT INTO Traffic (src_ip, dst_ip, protocol, src_port, dst_port, bytes_sent,
+                INSERT INTO Traffic (time, src_ip, dst_ip, protocol, src_port, dst_port, bytes_sent,
                                         bytes_recvd, flow_packets, flow_bytes, avg_packet_size, max_packet_size,
                                         num_packets, payload_size, id, name)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 ON DUPLICATE KEY UPDATE
+                    time = VALUES(time),
                     src_ip = VALUES(src_ip),
                     dst_ip = VALUES(dst_ip),
                     protocol = VALUES(protocol),
@@ -93,7 +39,7 @@ def store_results(result, sessions):
                     num_packets = VALUES(num_packets),
                     payload_size = VALUES(payload_size)
                 """
-
+        
         # Check if result is a list of JSON objects
         if not isinstance(parsed_output, list):
             session = sessions[0]
@@ -121,14 +67,15 @@ def store_results(result, sessions):
             source_ip = str(ipaddress.IPv4Address(session.src_ip))
             dest_ip = str(ipaddress.IPv4Address(session.dst_ip))
 
-            values = (source_ip, dest_ip, session.protocol, session.src_port, session.dst_port, session.bytes_sent, session.bytes_recvd,
+            values = (timestamp, source_ip, dest_ip, session.protocol, session.src_port, session.dst_port, session.bytes_sent, session.bytes_recvd,
                     session.flow_packets, session.flow_bytes, session.avg_pakt_size, session.max_pakt_size, session.total_packets, session.total_payload,
                     parsed_output["Cluster ID"], parsed_output["Label"])
             cursor.execute(traffic_query, values)
-
+        
         else:
             # Pair each result with its associated network session
             grouping = list(zip(parsed_output, sessions))
+
             for g in grouping:
                 p = g[0]
                 s = g[1]
@@ -153,17 +100,17 @@ def store_results(result, sessions):
                             options, timestamp)
 
                 cursor.execute(class_query, values)
-               
+
                 # Convert ip addresses back from integers to octet notation
                 source_ip = str(ipaddress.IPv4Address(s.src_ip))
                 dest_ip = str(ipaddress.IPv4Address(s.dst_ip))
 
-                values = (source_ip, dest_ip, s.protocol, s.src_port, s.dst_port, s.bytes_sent, s.bytes_recvd,
+                values = (timestamp, source_ip, dest_ip, s.protocol, s.src_port, s.dst_port, s.bytes_sent, s.bytes_recvd,
                         s.flow_packets, s.flow_bytes, s.avg_pakt_size, s.max_pakt_size, s.total_packets, s.total_payload,
                         p["Cluster ID"], p["Label"])
                 cursor.execute(traffic_query, values)
 
-        conn.commit()
+        client.commit()
         print("Successfully added items.")
 
     except mysql.connector.DatabaseError as derr:
@@ -174,10 +121,6 @@ def store_results(result, sessions):
 
     except mysql.connector.InterfaceError as ierr:
         print(f"\n** Caught database interface issue: {ierr}")
-
+    
     except Exception as err:
         print(f"\n** Caught database exception: {err}")
-
-    finally:
-        cursor.close()
-        conn.close()

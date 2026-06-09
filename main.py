@@ -6,14 +6,19 @@ Date: 2025-07-21
 """
 
 import os
-from modeltrainer import ModelTrainer
-from normalizer import Normalizer
-from validator import ClusterValidator
-from scan_pcap import scan_pcap
-from store_results import store_results
-from fetch_file import fetch_file
+import json
+import time
+from training.modeltrainer import ModelTrainer
+from training.normalizer import Normalizer
+from training.validator import ClusterValidator
+from database.connect_dbclient import connect_dbclient
+from database.get_total import get_total
+from analysis.scan_pcap import scan_pcap
+from database.store_results import store_results
+from analysis.fetch_file import fetch_file
 from flask import Flask, render_template, request
-from packetsniffer import sniff_traffic
+from analysis.packetsniffer import sniff_traffic
+from analysis.evaluator import Evaluator
 
 
 def create_platform(trainer, model, bottleneck, dataset):
@@ -22,7 +27,7 @@ def create_platform(trainer, model, bottleneck, dataset):
     # Set directory for files
     app.config['UPLOAD_FOLDER'] = "./uploads"
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-
+    
     # Set arguments
     app.config['trainer'] = trainer
     app.config['model'] = model
@@ -33,66 +38,103 @@ def create_platform(trainer, model, bottleneck, dataset):
     labels = app.config['trainer'].unfiltered_labels
     filtered_labels = set(labels[labels != -1])
 
+    # Connect to database client
+    client, cursor = connect_dbclient()
+
     @app.route("/")
     def load_home():
         return render_template("home.html")
 
     @app.route("/analysis")
     def load_analysis():
-        return render_template("analysis.html")
+        try:
+            n_packets, n_threats, n_days = get_total(cursor)
+        
+        except Exception as err:
+            cursor.close()
+            client.close()
+            return f"Caught exception: {err}"
+
+        return render_template("analysis.html", packets=n_packets, threats=n_threats, days=n_days)
 
     @app.route("/records")
     def load_records():
-        return render_template("records.html")
+        try:
+            monthly_threats, monthly_safe = Evaluator.get_annual_estimates(cursor)
+            threat_types, threat_count = Evaluator.get_threat_types(cursor)
+            packets = Evaluator.get_traffic_records(cursor)
 
-    @app.route("/scan-cap", methods=['POST'])
+        except Exception as err:
+            cursor.close()
+            client.close()
+            return f"Caught exception: {err}"
+
+        return render_template("records.html", month_threats=monthly_threats, month_safe=monthly_safe, 
+                               types=threat_types, count=threat_count, traffic=packets)
+
+    @app.route("/scan", methods=['POST'])
     def scan_capture():
         try:
             # Retrieve file through HTTP POST request
-            cap = request.files['capture']
-            file_path = fetch_file(cap, app.config['UPLOAD_FOLDER'])
+            result = ""
+            method_type = "unknown request"
+            start_time = time.time()
+            if (request.files.get('capture') != None):
+                method_type="File scan"
+                cap = request.files['capture']
+                file_path = fetch_file(cap, app.config['UPLOAD_FOLDER'])
+                
+                # Scan pcap file using Gemini AI to make final prediction
+                result, sessions = scan_pcap(file_path, app.config['trainer'], app.config['model'], 
+                                             app.config['bottleneck'], app.config['dataset'], filtered_labels)
 
-            # Scan pcap file using Gemini AI to make final prediction
-            result, sessions = scan_pcap(file_path, app.config['trainer'], app.config['model'], app.config['bottleneck'], app.config['dataset'], filtered_labels)
+                # Store generated results and traffic data in MySQL database
+                store_results(client, cursor, result, sessions)
 
-            # Store generated results and traffic data in MySQL database
-            store_results(result, sessions)
+            elif (request.form.get('count') != None):
+                # Retrieve entered number of packets to scan through HTTP POST request
+                method_type="Live scan"
+                limit = request.form.get('count')
+                
+                # Scan requested number of packets in real-time
+                sniff_traffic(int(limit))
 
-            return "Done"
+                # Analyze packets captured in newly-written pcap file
+                result, sessions = scan_pcap("uploads/new_capture.pcap", app.config['trainer'], app.config['model'],
+                                             app.config['bottleneck'], app.config['dataset'], filtered_labels)
 
-        except Exception as err:
-            return f"There is a problem: {err}"
+                # Store generated results and traffic data in MySQL database
+                store_results(client, cursor, result, sessions)
+                
+            else:
+                cursor.close()
+                client.close()
+                return "Unknown request. Please try again." 
 
-    @app.route("/scan-live", methods=['POST'])
-    def scan_live():
-        try:
-            # Retrieve entered number of packets to scan through HTTP POST request
-            limit = request.form.get('count')
-
-            # Scan requested number of packets in real-time
-            sniff_traffic(int(limit))
-
-            # Analyze packets captured in newly-written pcap file
-            result, sessions = scan_pcap("new_capture.pcap", app.config['trainer'], app.config['model'],
-                                         app.config['bottleneck'], app.config['dataset'], filtered_labels)
-
-            # Store generated results and traffic data in MySQL database
-            store_results(result, sessions)
-
-            return "Live scan complete."
-
-        except Exception as err:
-            return f"Caught live scan error: {err}"
+            end_time = time.time()
+            elapsed_time = round(end_time - start_time, 2)
+            
+            num_packets = 0
+            for s in sessions:
+                num_packets += s.total_packets
     
+            return render_template("scan.html", output=result, total=num_packets,
+                                   method=method_type, time=elapsed_time)
+        
+        except Exception as err:
+            cursor.close()
+            client.close()
+            return f"Caught {method_type} error: {err}" 
+
     return app
 
 
-if __name__ == '__main__':
+if __name__ == '__main__': 
     # Setup training model for the dataset
     trainer = ModelTrainer()
 
     # Split data into training, testing, and validation sets
-    trainer.split_data('network_traffic.csv', 0.75)
+    trainer.split_data("training/network_traffic.csv", 0.75)
 
     # Clean up and transform data into usable format for efficient model training
     pipeline = Normalizer.create_normalization_pipeline()
